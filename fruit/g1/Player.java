@@ -13,6 +13,7 @@ public class Player extends fruit.sim.Player
     private int[] uniform_platter;
     private int[] r0_seen_fruit;
     private int[] r1_seen_fruit;
+    private int place;
 
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0;
@@ -24,7 +25,7 @@ public class Player extends fruit.sim.Player
         r0_seen_fruit = new int[preferences.length];
         r1_seen_fruit = new int[preferences.length];
         uniform_platter = new int[preferences.length];
-        //System.out.println("g1 index: " + getIndex());
+        place = getIndex();
     }
 
     public boolean pass(int[] bowl, int bowlId, int round,
@@ -45,10 +46,15 @@ public class Player extends fruit.sim.Player
         }
 
         // we try to infer the current platter using the information that we have
+        
+        // first we generate a platter
+        // for now uniform, must improve on this
         int total_fruit = bowlsize*nplayers;
         for (int i=0; i < uniform_platter.length; i++) {
             uniform_platter[i] = Math.round(total_fruit/uniform_platter.length);
         }
+        // update quantities based on observations
+        updatePlatterQuantities(uniform_platter, round);
         disp(uniform_platter);
         int ev = calculateExpectedValue(uniform_platter);
         System.out.println("EV = " + ev + "\n");
@@ -64,6 +70,19 @@ public class Player extends fruit.sim.Player
             // take the bowl if the score exceed expected value
             return score > ev;
         }        
+    }
+
+    // UPDATE A GIVEN PLATTERS QUANTITIES BY THE OBSERVATIONS WE HAVE MADE
+    // IN THE GIVEN ROUND TO CALCULATE THE REMAINING FRUITS IN THE PLATTER
+    private void updatePlatterQuantities(int[] platter, int round) {
+        for (int i=0; i < platter.length; i++) {
+            if (round == FIRST) {
+                platter[i] -= r0_seen_fruit[i];
+            }
+            else {
+                platter[i] -= r1_seen_fruit[i];
+            }
+        }
     }
 
     private int scoreBowl(int[] bowl) {
