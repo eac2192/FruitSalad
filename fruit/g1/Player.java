@@ -13,7 +13,7 @@ public class Player extends fruit.sim.Player
     private int[] uniform_platter;
     private int[] r0_seen_fruit;
     private int[] r1_seen_fruit;
-    private int place;
+    private int[] bowls_seen; 
 
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0;
@@ -25,7 +25,7 @@ public class Player extends fruit.sim.Player
         r0_seen_fruit = new int[preferences.length];
         r1_seen_fruit = new int[preferences.length];
         uniform_platter = new int[preferences.length];
-        place = getIndex();
+        bowls_seen = new int[2];
     }
 
     public boolean pass(int[] bowl, int bowlId, int round,
@@ -35,6 +35,7 @@ public class Player extends fruit.sim.Player
         // we add the new information to the list of frui we have seen
         // depending on which round we are on 
         bowlsize = 0;
+        bowls_seen[round]++;
         for (int i=0; i < bowl.length; i++) {
             bowlsize += bowl[i];
             if (round == FIRST) {
@@ -56,19 +57,28 @@ public class Player extends fruit.sim.Player
         // update quantities based on observations
         updatePlatterQuantities(uniform_platter, round);
         disp(uniform_platter);
-        int ev = calculateExpectedValue(uniform_platter);
-        System.out.println("EV = " + ev + "\n");
-        
-        // compute the score of the bowl we received
-        int score = scoreBowl(bowl);
-        System.out.println("BOWL = " + score + "\n");
+
+
 
         if (!canPick || musTake) {
             return false;
         }
         else {
-            // take the bowl if the score exceed expected value
-            return score > ev;
+            int ev = calculateExpectedValue(uniform_platter);
+            System.out.println("EV = " + ev + "\n");
+            
+            // compute the score of the bowl we received
+            int score = scoreBowl(bowl);
+            System.out.println("BOWL = " + score + "\n");
+
+            // we do a linear interpolation based on the number of bowls we
+            // will get to see and set the threshold for our decision based
+            // on that
+            double lin_range = 0.66;
+            int bowls_ill_see = nplayers - getIndex();
+            int max_score = 12*bowlsize;
+            double seg = (max_score-ev)*lin_range/bowls_ill_see;
+            return score > (ev + seg*(bowls_ill_see - bowls_seen[round] -1));
         }        
     }
 
