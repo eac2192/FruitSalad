@@ -1,4 +1,3 @@
-package fruit.g1;
 
 public class FruitGenerator //implements fruit.sim.FruitGenerator
 {

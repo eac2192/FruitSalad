@@ -1,5 +1,6 @@
+package fruit.g1;
 
-public class FruitGenerator //implements fruit.sim.FruitGenerator
+public class FruitGenerator implements fruit.sim.FruitGenerator
 {
     public int[] generate(int nplayers, int bowlsize) {
         int nfruits = nplayers * bowlsize;
