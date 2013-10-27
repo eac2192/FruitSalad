@@ -14,8 +14,6 @@ public class Player extends fruit.sim.Player
     private int[] r0_seen_fruit;
     private int[] r1_seen_fruit;
     private int[] bowls_seen; 
-    
-    private double[] fruit_probs;
 
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0;
@@ -27,7 +25,6 @@ public class Player extends fruit.sim.Player
         r0_seen_fruit = new int[preferences.length];
         r1_seen_fruit = new int[preferences.length];
         uniform_platter = new int[preferences.length];
-        fruit_probs = new double[preferences.length];
         bowls_seen = new int[2];
     }
 
