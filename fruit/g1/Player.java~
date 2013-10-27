@@ -50,29 +50,6 @@ public class Player extends fruit.sim.Player
                 r1_seen_fruit[i] += bowl[i];
             }
         }
-        
-        
-        // recompute the probabilities of each fruit in a 
-        // full platter based on what we've seen so far
-        
-        // start with a constant increment value for now, need to find a way to
-        // compute this mathematically
-        
-        int total_fruit = bowlsize * nplayers;
-        for (int i=0; i < fruit_probs.length; i++) {
-            fruit_probs[i] = 1.0 / NUM_FRUITS;
-        }
-        
-        double inc = 0.01, prob_sum = 0.0;
-        double scale = bowlsize * bowls_seen[round];
-        for (int i = 0; i < bowl.length; i++) {
-            fruit_probs[i] += (round == FIRST ? r0_seen_fruit[i] : r1_seen_fruit[i]) / scale * inc;
-            prob_sum += fruit_probs[i];
-        }
-        for (int i = 0; i < bowl.length; i++) {
-            fruit_probs[i] /= prob_sum;
-        }
-        
 
         // we try to infer the current platter using the information that we have
         
@@ -83,17 +60,39 @@ public class Player extends fruit.sim.Player
             uniform_platter[i] = Math.round(total_fruit/uniform_platter.length);
         }
         
+        
+        
+        // recompute the probabilities of each fruit in a 
+        // full platter based on what we've seen so far
+        
+        // start with a constant increment value for now, need to find a way to
+        // compute this mathematically
+        for (int i=0; i < fruit_probs.length; i++) {
+            fruit_probs[i] = 1.0 / NUM_FRUITS;
+        }
+        double inc = 0.01, prob_sum = 0.0;
+        double scale = bowlsize * bowls_seen[round];
+        for (int i = 0; i < bowl.length; i++) {
+            fruit_probs[i] += (round == FIRST ? r0_seen_fruit[i] : r1_seen_fruit[i]) / scale * inc;
+            prob_sum += fruit_probs[i];
+        }
+        for (int i = 0; i < bowl.length; i++) {
+            fruit_probs[i] /= prob_sum;
+        }
+        
         // generate a platter based on estimated probabilties of each fruit
         for (int i=0; i < est_platter.length; i++) {
             est_platter[i] = total_fruit * fruit_probs[i];
         }
         
         // update quantities based on observations
-        updatePlatterQuantities(uniform_platter, round);
+        //updatePlatterQuantities(uniform_platter, round);
+        //disp(uniform_platter);
+        updatePlatterQuantities(est_platter, round);
         disp(uniform_platter);
-
-
-
+        
+        
+        
         if (!canPick || musTake) {
             return false;
         }

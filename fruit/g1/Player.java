@@ -50,6 +50,16 @@ public class Player extends fruit.sim.Player
                 r1_seen_fruit[i] += bowl[i];
             }
         }
+
+        // we try to infer the current platter using the information that we have
+        
+        // first we generate a platter
+        // for now uniform, must improve on this
+        int total_fruit = bowlsize*nplayers;
+        for (int i=0; i < uniform_platter.length; i++) {
+            uniform_platter[i] = Math.round(total_fruit/uniform_platter.length);
+        }
+        
         
         
         // recompute the probabilities of each fruit in a 
@@ -57,8 +67,6 @@ public class Player extends fruit.sim.Player
         
         // start with a constant increment value for now, need to find a way to
         // compute this mathematically
-        
-        int total_fruit = bowlsize * nplayers;
         for (int i=0; i < fruit_probs.length; i++) {
             fruit_probs[i] = 1.0 / NUM_FRUITS;
         }
@@ -72,27 +80,19 @@ public class Player extends fruit.sim.Player
             fruit_probs[i] /= prob_sum;
         }
         
-
-        // we try to infer the current platter using the information that we have
-        
-        // first we generate a platter
-        // for now uniform, must improve on this
-        int total_fruit = bowlsize*nplayers;
-        for (int i=0; i < uniform_platter.length; i++) {
-            uniform_platter[i] = Math.round(total_fruit/uniform_platter.length);
-        }
-        
         // generate a platter based on estimated probabilties of each fruit
         for (int i=0; i < est_platter.length; i++) {
             est_platter[i] = total_fruit * fruit_probs[i];
         }
         
         // update quantities based on observations
-        updatePlatterQuantities(uniform_platter, round);
-        disp(uniform_platter);
-
-
-
+        //updatePlatterQuantities(uniform_platter, round);
+        //disp(uniform_platter);
+        updatePlatterQuantities(est_platter, round);
+        disp(est_platter);
+        
+        
+        
         if (!canPick || musTake) {
             return false;
         }
