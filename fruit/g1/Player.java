@@ -26,6 +26,9 @@ public class Player extends fruit.sim.Player
     private final int SECOND = 1;
     
     public void init(int nplayers, int[] pref) {
+	
+		// here's a comment!
+	
         this.nplayers = nplayers;
         preferences = pref.clone();
         r0_seen_fruit = new int[preferences.length];
