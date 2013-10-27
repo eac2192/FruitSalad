@@ -147,6 +147,7 @@ public class Player extends fruit.sim.Player
             else {
                 platter[i] -= r1_seen_fruit[i];
             }
+            if (platter[i] < 0) platter[i] = 0; // accounts for possible negative values
         }
     }
 
