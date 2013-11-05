@@ -2,10 +2,11 @@ package fruit.g1;
 
 import java.util.*;
 
+// Group 1 player
 public class Player extends fruit.sim.Player
 {
 
-    private Random random = new Random();
+    private Random random;
     
     private int nplayers, bowlsize; 
     private int[] preferences;
@@ -19,7 +20,7 @@ public class Player extends fruit.sim.Player
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0, SECOND = 1;
     
-    public void init(int nplayers, int[] pref) {	
+    public void init(int nplayers, int[] pref) {
         this.nplayers = nplayers;
         preferences = pref.clone();
         r0_seen_fruit = new int[preferences.length];
@@ -28,6 +29,7 @@ public class Player extends fruit.sim.Player
         fruit_probs = new double[preferences.length];
         r0_probs = new double[preferences.length];
         bowls_seen = new int[2];
+        random = new Random();
     }
 
     public boolean pass(int[] bowl, int bowlId, int round, boolean canPick, boolean musTake) {
@@ -86,36 +88,34 @@ public class Player extends fruit.sim.Player
         
         
         
-        if (!canPick || musTake) {
-            return false;
-        }
-        else {
+        if (!canPick || musTake) return false;
+        
             //int ev = calculateExpectedValue(uniform_platter);
-            int[] ev_max = calculateExpectedAndMaxValue(est_platter);
-            int ev = ev_max[0];
-            int max_score = ev_max[1];
-            System.out.println("EV = " + ev + "\n");
-            System.out.println("MAX = " + max_score + "\n");
+        int[] ev_max = calculateExpectedAndMaxValue(est_platter);
+        int ev = ev_max[0];
+        int max_score = ev_max[1];
+        System.out.println("EV = " + ev + "\n");
+        System.out.println("MAX = " + max_score + "\n");
             
-            // compute the score of the bowl we received
-            int score = scoreBowl(bowl);
-            System.out.println("BOWL = " + score + "\n");
+        // compute the score of the bowl we received
+        int score = scoreBowl(bowl);
+        System.out.println("BOWL = " + score + "\n");
 
-            // we do a linear interpolation based on the number of bowls we
-            // will get to see and set the threshold for our decision based
-            // on that
+        // we do a linear interpolation based on the number of bowls we
+        // will get to see and set the threshold for our decision based
+        // on that
             
-            // EDIT: Using our new estimation tactic, this strategy is now very strict
-            // and out player passes on almost every bowl, needs refining
+        // EDIT: Using our new estimation tactic, this strategy is now very strict
+        // and out player passes on almost every bowl, needs refining
             
-            double lin_range = 0.5; // why this value?
-            int bowls_ill_see = nplayers - getIndex();
-            //int max_score = 12*bowlsize;
-            double seg = (max_score - ev)*lin_range/bowls_ill_see;
-            int bowls_left = bowls_ill_see - bowls_seen[round] - 1;
-            System.out.println("bowls left: " + bowls_left);
-            return score > (ev + seg * bowls_left);
-        }        
+        double lin_range = 0.5; // why this value?
+        int bowls_ill_see = nplayers - getIndex();
+        //int max_score = 12*bowlsize;
+        double seg = (max_score - ev)*lin_range/bowls_ill_see;
+        int bowls_left = bowls_ill_see - bowls_seen[round] - 1;
+        System.out.println("bowls left: " + bowls_left);
+        
+        return score > (ev + seg * bowls_left);
     }
 
     // UPDATE A GIVEN PLATTERS QUANTITIES BY THE OBSERVATIONS WE HAVE MADE
