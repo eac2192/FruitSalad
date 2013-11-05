@@ -3,24 +3,22 @@ package fruit.g1;
 import java.util.*;
 
 // Group 1 player
-public class Player extends fruit.sim.Player
-{
+public class Player extends fruit.sim.Player {
 
     private Random random;
-    
     private int nplayers, bowlsize; 
     private int[] preferences;
-    
     private int[] est_platter;
     private int[] r0_seen_fruit, r1_seen_fruit;
     private int[] bowls_seen; 
-    
     private double[] fruit_probs, r0_probs;
 
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0, SECOND = 1;
     
+    
     public void init(int nplayers, int[] pref) {
+        
         this.nplayers = nplayers;
         preferences = pref.clone();
         r0_seen_fruit = new int[preferences.length];
@@ -30,7 +28,9 @@ public class Player extends fruit.sim.Player
         r0_probs = new double[preferences.length];
         bowls_seen = new int[2];
         random = new Random();
+        
     }
+
 
     public boolean pass(int[] bowl, int bowlId, int round, boolean canPick, boolean musTake) {
         
@@ -48,14 +48,12 @@ public class Player extends fruit.sim.Player
             }
         }
         
-        
         // recompute the probabilities of each fruit in a 
         // full platter based on what we've seen so far
         // if first round, reset probabilites to uniform,
         // else use probabilities from end of first round
         if (round == FIRST) java.util.Arrays.fill(fruit_probs, 1.0 / NUM_FRUITS);
         else fruit_probs = r0_probs.clone();
-        
         
         // start with a constant increment value for now, need to find a way to
         // compute this mathematically
@@ -86,8 +84,6 @@ public class Player extends fruit.sim.Player
         updatePlatterQuantities(est_platter, round);
         System.out.print("est platter after: "); disp(est_platter);
         
-        
-        
         if (!canPick || musTake) return false;
         
             //int ev = calculateExpectedValue(uniform_platter);
@@ -101,22 +97,19 @@ public class Player extends fruit.sim.Player
         int score = scoreBowl(bowl);
         System.out.println("BOWL = " + score + "\n");
 
-        // we do a linear interpolation based on the number of bowls we
-        // will get to see and set the threshold for our decision based
-        // on that
-            
-        // EDIT: Using our new estimation tactic, this strategy is now very strict
-        // and out player passes on almost every bowl, needs refining
-            
-        double lin_range = 0.5; // why this value?
+        // we do a linear interpolation based on the number of bowls we will
+        // get to see and set the threshold for our decision based on that
+  
+        double lin_range = 0.5; // try to pick a better value, maybe based on position?
         int bowls_ill_see = nplayers - getIndex();
-        //int max_score = 12*bowlsize;
         double seg = (max_score - ev)*lin_range/bowls_ill_see;
         int bowls_left = bowls_ill_see - bowls_seen[round] - 1;
         System.out.println("bowls left: " + bowls_left);
         
         return score > (ev + seg * bowls_left);
+        
     }
+
 
     // UPDATE A GIVEN PLATTERS QUANTITIES BY THE OBSERVATIONS WE HAVE MADE
     // IN THE GIVEN ROUND TO CALCULATE THE REMAINING FRUITS IN THE PLATTER
@@ -132,6 +125,7 @@ public class Player extends fruit.sim.Player
         }
     }
 
+
     private int scoreBowl(int[] bowl) {
         int score = 0;
         for (int i = 0; i < preferences.length; i++) {
@@ -139,6 +133,7 @@ public class Player extends fruit.sim.Player
         }
         return score;
     }
+
 
     private void disp(int[] bowl) {
         String str = "|";
@@ -148,6 +143,7 @@ public class Player extends fruit.sim.Player
         str += "\n";
         System.out.println(str);
     }
+
 
     // GIVEN A PLATTER EMULATING THE DISTRIBUTION OF THE SERVING BOWL
     // IT WILL CALCULATE THE EMPIRICAL EXPECTED VALUE ACCOUNTING FOR
@@ -165,6 +161,7 @@ public class Player extends fruit.sim.Player
         int[] return_val = {Math.round(total_score/10000), max_score};
         return return_val;
     }
+
 
     // GENERATES A BOWL IN THE SAME FASHION THAT THE SIMULATOR DOES
     // TAKING INTO ACCOUNT CLUSTERING FACTOR
@@ -184,6 +181,7 @@ public class Player extends fruit.sim.Player
         }
         return bowl;
     }
+
 
     // GIVEN A PLATER WITH A BUNCH OF QUANTITIES FOR EACH FRUIT
     // PICKS A FRUIT INDEX TO SERVER UNIFORMLY FRUIT THE ACTUAL BOWL
