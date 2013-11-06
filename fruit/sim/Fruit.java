@@ -749,6 +749,7 @@ public class Fruit
         int bowlsize = DEFAULT_BOWL_SIZE;
         String distPath = DEFAULT_DISTRIBUTION;
         int repeats = 1;
+        System.out.println(args);
 
         // player list
         if (args.length > 0)
@@ -757,8 +758,10 @@ public class Fruit
         if (args.length > 1)
             bowlsize = Integer.parseInt(args[1]);
         // distribution
-        if (args.length > 2)
+        if (args.length > 2) {
             distPath = args[2];
+            System.out.println(distPath);
+        }
         // enable gui?
         if (args.length > 3)
             gui = Boolean.parseBoolean(args[3]);

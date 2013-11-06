@@ -15,6 +15,7 @@ public class Player extends fruit.sim.Player {
 
     private final int NUM_FRUITS = 12;
     private final int FIRST = 0, SECOND = 1;
+    private final int SAMPLE_NUM = 10000;
     
     
     public void init(int nplayers, int[] pref) {
@@ -86,12 +87,12 @@ public class Player extends fruit.sim.Player {
         
         if (!canPick || musTake) return false;
         
-            //int ev = calculateExpectedValue(uniform_platter);
-        int[] ev_max = calculateExpectedAndMaxValue(est_platter);
-        int ev = ev_max[0];
-        int max_score = ev_max[1];
+        //int ev = calculateExpectedValue(uniform_platter);
+        int[] dist = calculateExpectedAndStandardDev(est_platter);
+        int ev = dist[0];
+        int stdev = dist[1];
         System.out.println("EV = " + ev + "\n");
-        System.out.println("MAX = " + max_score + "\n");
+        System.out.println("STDEV = " + stdev + "\n");
             
         // compute the score of the bowl we received
         int score = scoreBowl(bowl);
@@ -100,12 +101,14 @@ public class Player extends fruit.sim.Player {
         // we do a linear interpolation based on the number of bowls we will
         // get to see and set the threshold for our decision based on that
   
-        double lin_range = 0.5; // try to pick a better value, maybe based on position?
+        double lin_range = 0.8; // try to pick a better value, maybe based on position?
         int bowls_ill_see = nplayers - getIndex();
-        double seg = (max_score - ev)*lin_range/bowls_ill_see;
+        double seg = stdev*lin_range/bowls_ill_see;
         int bowls_left = bowls_ill_see - bowls_seen[round] - 1;
         System.out.println("bowls left: " + bowls_left);
-        
+        System.out.println("BOUNDARY = " + (ev + seg * bowls_left) + "\n");
+
+
         return score > (ev + seg * bowls_left);
         
     }
@@ -148,17 +151,28 @@ public class Player extends fruit.sim.Player {
     // GIVEN A PLATTER EMULATING THE DISTRIBUTION OF THE SERVING BOWL
     // IT WILL CALCULATE THE EMPIRICAL EXPECTED VALUE ACCOUNTING FOR
     // CLUSTERING AND SERVING IN THE SAME MANNER AS THE SIMULATOR
-    private int[] calculateExpectedAndMaxValue(int[] platter) {
+    private int[] calculateExpectedAndStandardDev(int[] platter) {
         int[] bowl;
         int total_score = 0;
         int max_score = -1;
-        for (int i=0; i < 10000; i++) {
+        int[] samples = new int[SAMPLE_NUM];
+        for (int i=0; i < SAMPLE_NUM; i++) {
             bowl = createBowl(platter);
             int bowl_score = scoreBowl(bowl);
+            samples[i] = bowl_score;
             total_score += bowl_score;
             if (bowl_score > max_score) max_score = bowl_score;
         }
-        int[] return_val = {Math.round(total_score/10000), max_score};
+        int ev = Math.round(total_score/SAMPLE_NUM);
+
+
+        int sum = 0;
+        for (int i=0; i < SAMPLE_NUM; i++) {
+            sum += Math.pow(samples[i] - ev, 2);
+        }
+        int stdv = (int) Math.round(Math.sqrt(sum/SAMPLE_NUM-1)); 
+
+        int[] return_val = {ev, stdv};
         return return_val;
     }
 
